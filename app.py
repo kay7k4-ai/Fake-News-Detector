@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, render_template
 import pickle
+import os
 
 app = Flask(__name__)
 
@@ -28,4 +29,4 @@ def predict():
     return jsonify({"label": label, "confidence": confidence})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.getenv("PORT", 5000)))

@@ -1,4 +1,6 @@
-flask
+Flask==3.0.*
+gunicorn
 scikit-learn
 pandas
 numpy
+nltk
