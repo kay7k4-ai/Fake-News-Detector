@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FakeNewsDetector</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- floating robot -->
+  <div class="robot-wrap" id="robotWrap">
+    <div class="robot-bubble" id="robotBubble">scanning...</div>
+    <svg class="robot-svg" width="54" height="72" viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="10" y="2" width="6" height="8" rx="2" fill="#30363d" stroke="#00ff88" stroke-width="0.8"/>
+      <line x1="13" y1="10" x2="13" y2="14" stroke="#00ff88" stroke-width="1"/>
+      <rect x="4" y="14" width="40" height="26" rx="6" fill="#161b22" stroke="#00ff88" stroke-width="1.2"/>
+      <g class="eye"><rect x="11" y="22" width="8" height="8" rx="2" fill="#0d1117" stroke="#00ff88" stroke-width="0.8"/><circle cx="15" cy="26" r="2" fill="#00ff88"/></g>
+      <g class="eye" style="animation-delay:0.2s"><rect x="29" y="22" width="8" height="8" rx="2" fill="#0d1117" stroke="#00ff88" stroke-width="0.8"/><circle cx="33" cy="26" r="2" fill="#00ff88"/></g>
+      <rect x="16" y="33" width="16" height="4" rx="2" fill="#0d1117" stroke="#30363d" stroke-width="0.8"/>
+      <rect class="scan-line" x="17" y="34.5" width="5" height="1" rx="0.5" fill="#00ff88"/>
+      <rect x="0" y="42" width="10" height="18" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+      <rect x="38" y="42" width="10" height="18" rx="4" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+      <rect x="8" y="40" width="32" height="6" rx="2" fill="#21262d" stroke="#30363d" stroke-width="0.8"/>
+      <rect x="14" y="58" width="8" height="6" rx="2" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+      <rect x="26" y="58" width="8" height="6" rx="2" fill="#161b22" stroke="#30363d" stroke-width="0.8"/>
+      <circle cx="4" cy="18" r="2" fill="#00ff88" opacity="0.6"/>
+      <circle cx="44" cy="18" r="2" fill="#00ff88" opacity="0.6"/>
+    </svg>
+    <div class="robot-label">// v1.0</div>
+  </div>
+
+  <div class="app">
+
+    <nav class="navbar">
+      <div class="nav-logo">Fake<span>News</span>Detector</div>
+      <div class="nav-right">
+        <div class="nav-link">// TF-IDF + LogReg</div>
+        <a class="nav-link" href="https://github.com/yourusername/fake-news-detector" target="_blank">GitHub ↗</a>
+        <button class="nav-toggle" onclick="toggleTheme()" id="themeBtn">☀ Light</button>
+      </div>
+    </nav>
+
+    <div class="main-grid">
+
+      <div class="left-col">
+        <div class="box">
+          <div class="box-label"><span>$</span> paste_article --analyze</div>
+          <textarea id="newsText" placeholder="Paste a news headline or full article here...&#10;&#10;Tip: longer text gives more accurate results."></textarea>
+          <div class="char-row"><span id="charCount">0</span> / 1000</div>
+          <div class="btn-row">
+            <button class="btn-analyze" onclick="detect()">[ RUN ANALYSIS ]</button>
+            <button class="btn-clear" onclick="clearInput()">[ CLEAR ]</button>
+          </div>
+          <div class="error-box" id="errorBox"></div>
+        </div>
+
+        <div class="box grow">
+          <div class="box-label"><span>></span> analysis_output</div>
+          <div class="result-empty" id="resultEmpty">
+            <div class="empty-text">// awaiting input...<br>paste an article and run analysis to see results here.</div>
+          </div>
+          <div class="result-section" id="resultSection">
+            <div class="verdict-row">
+              <div class="verdict-badge" id="verdictBadge"></div>
+              <div>
+                <div class="confidence-text" id="confidenceText">0.0%</div>
+                <div class="confidence-sub">confidence score</div>
+              </div>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" id="barFill"></div></div>
+            <div class="stat-mini">
+              <div class="sm"><div class="sm-l">MODEL</div><div class="sm-v">LogReg</div></div>
+              <div class="sm"><div class="sm-l">VECTORIZER</div><div class="sm-v">TF-IDF</div></div>
+              <div class="sm"><div class="sm-l">STATUS</div><div class="sm-v green" id="statusVal">IDLE</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+
+        <!-- model stats with colored bars -->
+        <div class="box">
+          <div class="box-label"><span>#</span> model_stats</div>
+
+          <div class="acc-row"><div class="acc-l">Accuracy</div><div class="acc-v">98.6%</div></div>
+          <div class="acc-bar-bg"><div class="acc-bar accuracy" style="width:98.6%"></div></div>
+
+          <div class="acc-row"><div class="acc-l">Training samples</div><div class="acc-v muted">44,898</div></div>
+          <div class="acc-bar-bg"><div class="acc-bar samples" style="width:85%"></div></div>
+
+          <div class="acc-row"><div class="acc-l">Algorithm</div><div class="acc-v muted">Logistic Regression</div></div>
+
+          <div class="acc-row"><div class="acc-l">Features</div><div class="acc-v muted">TF-IDF 10k</div></div>
+          <div class="acc-bar-bg"><div class="acc-bar features" style="width:70%"></div></div>
+
+          <div class="acc-row"><div class="acc-l">ngram range</div><div class="acc-v muted">(1, 2)</div></div>
+          <div class="acc-bar-bg"><div class="acc-bar ngram" style="width:50%"></div></div>
+
+          <div class="acc-row"><div class="acc-l">Dataset</div><div class="acc-v muted">ISOT News</div></div>
+        </div>
+
+        <div class="box grow">
+          <div class="box-label"><span>↺</span> recent_checks <span class="new-badge">LIVE</span></div>
+          <div id="historyList">
+            <div class="history-empty">// no checks yet.<br>results will appear here.</div>
+          </div>
+        </div>
+
+        <div class="box">
+          <div class="box-label"><span>?</span> about</div>
+          <div class="about-item">
+            <div class="about-icon-row">
+              <div class="icon-sq">?</div>
+              <div class="about-title">What is fake news?</div>
+            </div>
+            <div class="about-body">Deliberately false info presented as real. Spreads fast online and influences elections, health, and public opinion.</div>
+          </div>
+          <div class="about-item">
+            <div class="about-icon-row">
+              <div class="icon-sq">!</div>
+              <div class="about-title">Limitations</div>
+            </div>
+            <div class="about-body">Trained on 2016–17 data. Works best on full paragraphs. Short headlines or modern slang may reduce accuracy.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <footer class="footer-bar">
+      <div class="footer-l">built with python · flask · scikit-learn · dataset: ISOT 44k articles</div>
+      <a class="footer-r" href="https://github.com/kay7k4-ai/Fake-News-Detector" target="_blank">view on github →</a>
+    </footer>
+
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
