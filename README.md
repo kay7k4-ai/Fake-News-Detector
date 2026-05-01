@@ -6,7 +6,7 @@ A machine learning web app that detects whether a news article is **real or fake
 ![Demo Screenshot 2](screenshots/demo2.png)
 
 ## 🚀 Live Demo
-[Click here to try it live](https://your-render-link.onrender.com)
+[Click here to try it live](https://fake-news-detector-aih4.onrender.com)
 
 ---
 
